@@ -8,4 +8,4 @@ version = "1.0.0"
 dependencies = ["pandas", "scikit-learn"]
 
 [project.scripts]
-snakey = "sampytools.__main__:main"
+sampytools = "sampytools.__main__:main"
