@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sampytools"
+version = "1.0.0"
+dependencies = ["pandas", "scikit-learn"]
+
+[project.scripts]
+snakey = "sampytools.__main__:main"
