@@ -19,3 +19,20 @@ pip install -e .
 - pandas_utils various utilities like make column names unique, strip trailing and leading spaces from column values
 - text utilities such as regex matching , removing duplicate lines
 - list_utils.py gives you list related utilities such as searching item in the list, flattening list of lists etc.
+
+# To build wheel
+
+First ensure you have ```build``` library installed
+
+Then run
+
+```bash
+python -m build
+```
+
+Above command will build the project and create wheel file.
+Then you can re-install the wheel in your virtual environment
+
+```bash
+pip install sampytools-1.0.0-py3-none-any.whl --force-reinstall
+```

@@ -2,9 +2,11 @@ import pandas as pd
 import numpy as np
 import datetime
 import logging
+from typing import List,Union
+import datetime
 
-def to_str():
-    return datetime.datetime.strftime
+def to_str(adate:Union[datetime.date,datetime.datetime], date_str_format:str)->str:
+    return datetime.datetime.strftime(adate, date_str_format)
 
 def to_yyyymmdd(date):
     return to_str(date, '%Y%m%d')
