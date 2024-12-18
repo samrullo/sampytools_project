@@ -1,4 +1,5 @@
 import itertools
+from typing import List, Any, Dict
 
 
 def flatten_list_of_lists(list_of_lists):
@@ -62,3 +63,17 @@ def get_list_diff(list1, list2):
 def print_list_items(mylist):
     for item in mylist:
         print(item)
+
+
+def reverse_list(thelist: List[Any]) -> List[Any]:
+    """
+    Reverse list items and return new list
+    """
+    return thelist[::-1]
+
+
+def construct_dict_from_list_of_key_values(flat_list: List[Any]) -> Dict[Any, Any]:
+    """
+    Convert a flat list where keys and values appear one after another to dictionary
+    """
+    return dict(zip(flat_list[::2], flat_list[1::2]))

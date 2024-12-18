@@ -27,7 +27,7 @@ First ensure you have ```build``` library installed
 Then run
 
 ```bash
-python -m build
+python -m build --no-isolation
 ```
 
 Above command will build the project and create wheel file.

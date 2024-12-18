@@ -36,6 +36,14 @@ def extract_subtext_from_big_text(big_text_lines, line_one, line_two):
     return big_text_lines[start_idx:end_idx + 1]
 
 
+def extract_lines_that_match_pattern(lines: List[str], thepattern, match_value: str) -> List[str]:
+    """
+    Extract lines matching certain pattern from list of lines
+    """
+    filtered_lines = [line for line in lines if re.search(thepattern, line).group() == match_value]
+    return filtered_lines
+
+
 def save_lines_to_file(file: pathlib.Path, lines: List):
     file.write_text("\n".join(lines))
     logging.info(f"Saved {len(lines)} lines to {file}")
@@ -80,7 +88,6 @@ def remove_duplicate_lines_in_text(original_file: pathlib.Path, refined_filename
     return ConfigDict({"new_file": new_file, "newtxtcnt": cnt})
 
 
-
 def get_sorted_non_zero_words_and_freqs_from_csr_mat_row(csr_matrix_row, tfidf_features):
     """
     csr_matrix which is the result of transforming messages into word frquencies by TfidfVectorizer
@@ -96,7 +103,8 @@ def get_sorted_non_zero_words_and_freqs_from_csr_mat_row(csr_matrix_row, tfidf_f
     return items
 
 
-def get_common_common_part_of_message_across_documents(message, tokenizer, csr_matrix_row, tfidf_features, throw_off_thresh=1):
+def get_common_common_part_of_message_across_documents(message, tokenizer, csr_matrix_row, tfidf_features,
+                                                       throw_off_thresh=1):
     """
     We are assuming a use case where we have lots of similar messages that differ only by one or two words
     We want this function to return common part across these similar messages
@@ -150,11 +158,14 @@ def get_message_clusters(messages, n_components=7):
 
     for idx, message in enumerate(messages):
         if message not in clustered_messages:
-            essential_part = get_common_common_part_of_message_across_documents(message, tokenizer, csr_mat[idx], tfidf_features, 1)
+            essential_part = get_common_common_part_of_message_across_documents(message, tokenizer, csr_mat[idx],
+                                                                                tfidf_features, 1)
             similarities = norm_nmf_features.dot(norm_nmf_features[idx, :])
             for msg_idx, similarity in enumerate(similarities):
                 if similarity > 0.9:
                     clustered_messages[messages[msg_idx]] = essential_part
 
-    logging.info(f"total of {len(clustered_messages)} distinct messages were mapped to {len(set(clustered_messages.values()))} distinct clusters")
-    return ConfigDict({'clustered_messages': clustered_messages, 'tfidf': tfidf, 'tfidf_features': tfidf_features, 'tokenizer': tokenizer, 'nmf_feature': nmf_features})
+    logging.info(
+        f"total of {len(clustered_messages)} distinct messages were mapped to {len(set(clustered_messages.values()))} distinct clusters")
+    return ConfigDict({'clustered_messages': clustered_messages, 'tfidf': tfidf, 'tfidf_features': tfidf_features,
+                       'tokenizer': tokenizer, 'nmf_feature': nmf_features})
