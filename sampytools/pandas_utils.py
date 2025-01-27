@@ -3,7 +3,8 @@ import pandas as pd
 import logging
 import re
 from typing import List, Tuple, Dict
-from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list,add_new_values_in_certain_item_location
+from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list, \
+    add_new_values_in_certain_item_location
 
 
 def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
@@ -224,7 +225,7 @@ def convert_dataframe_to_wiki_table(df, code_col="empty", good_table_class_name=
     return header + body
 
 
-def convert_columns_to_str(df:pd.DataFrame, str_columns:List[str]=None)->pd.DataFrame:
+def convert_columns_to_str(df: pd.DataFrame, str_columns: List[str] = None) -> pd.DataFrame:
     """
     Convert specified columns to string
     :param df: dataframe
@@ -375,7 +376,8 @@ def get_distinct_keys_from_list_of_dicts(thedict_list: List[dict]):
     return list(set(all_keys))
 
 
-def extract_dict_keys_to_columns(df: pd.DataFrame, col_name: str, remove_orig_col: bool = False) -> pd.DataFrame:
+def extract_dict_keys_to_columns(df: pd.DataFrame, col_name: str, remove_orig_col: bool = False,
+                                 prefix: str = "") -> pd.DataFrame:
     """
     Extract keys of dictionaries to dataframe columns
     :param df: dataframe
@@ -385,7 +387,16 @@ def extract_dict_keys_to_columns(df: pd.DataFrame, col_name: str, remove_orig_co
     """
     all_keys = get_distinct_keys_from_list_of_dicts(df[col_name].tolist())
     logging.info(f"{col_name} contains {len(all_keys)} distinct keys")
-    new_col_names=add_new_values_in_certain_item_location(df.columns.tolist(),col_name,all_keys,include_orig_item=not remove_orig_col)
+    if prefix:
+        added_col_names = [f"{prefix}_{col}" for col in all_keys]
+    else:
+        added_col_names = all_keys
+    new_col_names = add_new_values_in_certain_item_location(df.columns.tolist(), col_name, added_col_names,
+                                                            include_orig_item=not remove_orig_col)
     for new_col in all_keys:
-        df[new_col] = df[col_name].map(lambda thedict: thedict[new_col] if new_col in thedict else "")
+        if prefix:
+            new_col_name = f"{prefix}_{new_col}"
+        else:
+            new_col_name = new_col
+        df[new_col_name] = df[col_name].map(lambda thedict: thedict[new_col] if new_col in thedict else "")
     return df[new_col_names]

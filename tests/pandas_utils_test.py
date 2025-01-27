@@ -17,6 +17,9 @@ class MyTestCase(unittest.TestCase):
         twodf = extract_dict_keys_to_columns(df.copy(), "mydictcol", remove_orig_col=True)
         print(twodf.to_string())
         self.assertFalse("mydictcol" in twodf.columns)
+        threedf = extract_dict_keys_to_columns(df.copy(), "mydictcol", remove_orig_col=True, prefix="User")
+        print(threedf.to_string())
+        self.assertTrue("User_name" in threedf.columns)
 
 
 if __name__ == '__main__':
