@@ -1,7 +1,8 @@
+import pathlib
 import pandas as pd
 import logging
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 def make_column_names_unique(df: pd.DataFrame):
@@ -287,3 +288,16 @@ def convert_multi_index_col_to_one_dim_col(df: pd.DataFrame, join_char: str = ".
     mi_cols = clean_up_multi_index_cols(list(mi_cols))
     df.columns = [f"{join_char}".join(mi_col) for mi_col in mi_cols]
     return df
+
+
+def write_dataframes_to_excel(sht: Dict[str, Tuple[pd.DataFrame, bool]], folder: pathlib.Path, filename: str):
+    """
+    write multiple dataframes into single excel file
+    sht : Dictionary that maps sheet names to dataframe and whether to save with indices
+    folder : folder to save into
+    filename : filename to save with, must end with .xlsx
+    """
+    with pd.ExcelWriter(folder / filename, engine="openpyxl") as writer:
+        for sheet_name, (df, save_index) in sht.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=save_index)
+    logging.info(f"Finished writing {len(sht)} dataframes into {folder / filename}")
