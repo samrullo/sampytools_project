@@ -3,9 +3,15 @@ import pandas as pd
 import logging
 import re
 from typing import List, Tuple, Dict
+from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list,add_new_values_in_certain_item_location
 
 
-def make_column_names_unique(df: pd.DataFrame):
+def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    for dataframes that have duplicate column names, make column names unique by adding indices to their names
+    :param df: dataframe
+    :return: dataframe now with columns renamed to be unique
+    """
     cols = df.columns.tolist()
     cols_df = pd.DataFrame({'col_idx': cols, 'col_name': cols})
     cols_count_df = cols_df.groupby('col_idx')[['col_name']].count()
@@ -23,17 +29,29 @@ def make_column_names_unique(df: pd.DataFrame):
     duplicate_columns = cols_count_df[cols_count_df['col_name'] > 1].index.tolist()
     duplicate_cols_dict = {col: 1 for col in duplicate_columns}
 
-    return append_index_to_duplicate_columns(duplicate_cols_dict, cols)
+    return df[append_index_to_duplicate_columns(duplicate_cols_dict, cols)]
 
 
-def strip_string_columns(df, string_columns):
+def strip_string_columns(df, string_columns) -> pd.DataFrame:
+    """
+    Strip blanks from the end of string values
+    :param df: dataframe
+    :param string_columns: columns with string values
+    :return: dataframe whose string values are now stripped
+    """
     for col in string_columns:
         df[col] = df[col].fillna("")
         df[col] = df[col].apply(str.strip)
     return df
 
 
-def strip_trailing_and_leading_spaces_from_dataframe(df):
+def strip_trailing_and_leading_spaces_from_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Strip trailing and leading white spaces from string values of dataframe columns
+    :param df: dataframe
+    :return: dataframe now with string columns stripped of trailing and leading whitespaces
+    """
+    # this will attempt to convert all columns to strings
     for col in df.columns:
         try:
             df[col] = df[col].fillna("")
@@ -45,14 +63,31 @@ def strip_trailing_and_leading_spaces_from_dataframe(df):
     return df
 
 
-def convert_columns_to_numeric(df, numeric_columns):
+def convert_columns_to_numeric(df: pd.DataFrame, numeric_columns: List[str], fill_na_val: float = 0.0) -> pd.DataFrame:
+    """
+    convert specified columns to numeric
+    :param df: dataframe
+    :param numeric_columns: list of columns that should be converted to numeric type
+    :param fill_na_val : fill na value
+    :return: dataframe now with numeric columns
+    """
     for col in numeric_columns:
-        df[col] = df[col].fillna(0)
+        df[col] = df[col].fillna(fill_na_val)
         df[col] = pd.to_numeric(df[col])
     return df
 
 
-def diff_df_maker(df, cols: list, diff_cols: list, index, suffixes=('_x', '_y')):
+def diff_df_maker(df: pd.DataFrame, cols: List[str], diff_cols: List[str], index: str,
+                  suffixes: Tuple[str, str] = ('_x', '_y')) -> pd.DataFrame:
+    """
+    Compare values of related columns in a merged dataframe by taking difference, absolute difference and ratio
+    :param df: dataframe
+    :param cols: list of column names before merging two dataframes
+    :param diff_cols: list of numeric columns names that need to be compared
+    :param index: the column name on which two dataframes were merged
+    :param suffixes: tuple suffixes that were used when merging two dataframes
+    :return: dataframe with comparison
+    """
     write_cols = []
     if not isinstance(index, list):
         index = [index]
@@ -134,7 +169,13 @@ def pandas_multi_index_to_columns(agg_df: pd.DataFrame):
     return agg_df
 
 
-def pandas_series_multi_index_to_columns(agg_series: pd.Series, series_col_name="count"):
+def pandas_series_multi_index_to_columns(agg_series: pd.Series, series_col_name: str = "count") -> pd.DataFrame:
+    """
+    Multi index series to dataframe with columns representing each level of multi level index
+    :param agg_series: series with multi level index
+    :param series_col_name: series column name
+    :return: dataframe with columns representing levels of multi level index
+    """
     index_names = list(agg_series.index.names)
     df = pd.DataFrame({series_col_name: agg_series.values})
     cols = index_names + [series_col_name]
@@ -183,12 +224,12 @@ def convert_dataframe_to_wiki_table(df, code_col="empty", good_table_class_name=
     return header + body
 
 
-def convert_columns_to_str(df, str_columns=None):
+def convert_columns_to_str(df:pd.DataFrame, str_columns:List[str]=None)->pd.DataFrame:
     """
     Convert specified columns to string
-    :param df:
-    :param str_columns:
-    :return:
+    :param df: dataframe
+    :param str_columns: list columns that need to be converted to string
+    :return: dataframe with now specified columns converted to string
     """
     if not str_columns:
         str_columns = df.columns
@@ -293,11 +334,58 @@ def convert_multi_index_col_to_one_dim_col(df: pd.DataFrame, join_char: str = ".
 def write_dataframes_to_excel(sht: Dict[str, Tuple[pd.DataFrame, bool]], folder: pathlib.Path, filename: str):
     """
     write multiple dataframes into single excel file
-    sht : Dictionary that maps sheet names to dataframe and whether to save with indices
-    folder : folder to save into
-    filename : filename to save with, must end with .xlsx
+    :param sht: Dictionary that maps sheet names to dataframe and whether to save with indices
+    :param folder: folder to save into
+    :param filename: filename to save with, must end with .xlsx
+    :return: None
     """
     with pd.ExcelWriter(folder / filename, engine="openpyxl") as writer:
         for sheet_name, (df, save_index) in sht.items():
             df.to_excel(writer, sheet_name=sheet_name, index=save_index)
     logging.info(f"Finished writing {len(sht)} dataframes into {folder / filename}")
+
+
+def convert_df_col_to_dicts(df: pd.DataFrame, col_name: str, sep: str = ";",
+                            should_reverse: bool = False) -> pd.DataFrame:
+    """
+    Convert dataframe columns that has key,vals separated by character to a dictionary
+    :param df: dataframe
+    :param col_name: column that has text of key,val separated by character
+    :param sep: separator character
+    :param should_reverse: should we reverse list after separate by character
+    :return: dataframe with the column now having dictionry instead of key,val text
+    """
+    df[col_name] = df[col_name].map(lambda col_text: col_text.split(sep))
+    if should_reverse:
+        df[col_name] = df[col_name].apply(reverse_list)
+    df[col_name] = df[col_name].apply(construct_dict_from_list_of_key_values)
+    return df
+
+
+def get_distinct_keys_from_list_of_dicts(thedict_list: List[dict]):
+    """
+    Get distinct key names from a list of dictionaries
+    :param thedict_list: list of dictionaries. most often we expect dictionaries to have similar keys
+    :return: distinct list of keys used by dictionaries in the list
+    """
+    all_keys = []
+    for thedictval in thedict_list:
+        thekeys = list(thedictval.keys())
+        all_keys += thekeys
+    return list(set(all_keys))
+
+
+def extract_dict_keys_to_columns(df: pd.DataFrame, col_name: str, remove_orig_col: bool = False) -> pd.DataFrame:
+    """
+    Extract keys of dictionaries to dataframe columns
+    :param df: dataframe
+    :param col_name: column that has dictionaries
+    :param remove_orig_col: whether to remove original column after extracting its values to separate columns
+    :return: dataframe now has new columns representing keys in dictionaries
+    """
+    all_keys = get_distinct_keys_from_list_of_dicts(df[col_name].tolist())
+    logging.info(f"{col_name} contains {len(all_keys)} distinct keys")
+    new_col_names=add_new_values_in_certain_item_location(df.columns.tolist(),col_name,all_keys,include_orig_item=not remove_orig_col)
+    for new_col in all_keys:
+        df[new_col] = df[col_name].map(lambda thedict: thedict[new_col] if new_col in thedict else "")
+    return df[new_col_names]

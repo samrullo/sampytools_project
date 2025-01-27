@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Union
 
 
 def flatten_list_of_lists(list_of_lists):
@@ -77,3 +77,20 @@ def construct_dict_from_list_of_key_values(flat_list: List[Any]) -> Dict[Any, An
     Convert a flat list where keys and values appear one after another to dictionary
     """
     return dict(zip(flat_list[::2], flat_list[1::2]))
+
+
+def add_new_values_in_certain_item_location(orig_list: List[Any], item_val: Union[str, int, float], new_vals: List[Any],
+                                            include_orig_item: bool = True) -> List[Any]:
+    """
+    Add new values in the location where item_val appears
+    :param orig_list:
+    :param item_val:
+    :param new_vals:
+    :param include_orig_item: whether to include original item in the list
+    :return:
+    """
+    item_index = orig_list.index(item_val)
+    if include_orig_item:
+        return orig_list[:item_index + 1] + new_vals + orig_list[item_index + 1:]
+    else:
+        return orig_list[:item_index] + new_vals + orig_list[item_index + 1:]
