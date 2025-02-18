@@ -2,9 +2,10 @@ import pathlib
 import pandas as pd
 import logging
 import re
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list, \
     add_new_values_in_certain_item_location
+from enum import IntEnum
 
 
 def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
@@ -400,3 +401,48 @@ def extract_dict_keys_to_columns(df: pd.DataFrame, col_name: str, remove_orig_co
             new_col_name = new_col
         df[new_col_name] = df[col_name].map(lambda thedict: thedict[new_col] if new_col in thedict else "")
     return df[new_col_names]
+
+
+def get_mask_for_matching_column_against_pattern(df: pd.DataFrame, col_name: str, one_pattern: re.Pattern):
+    """
+    Get True/False series by matching dataframe column values against a pattern
+    :param df: dataframe
+    :param col_name: column with string values
+    :param one_pattern: pattern to match
+    :return: mask with True/False values
+    """
+    return df[col_name].map(lambda col_val: True if re.match(one_pattern, col_val) else False)
+
+
+def filter_df_records_matching_one_pattern(df: pd.DataFrame, col_name: str, one_pattern: re.Pattern):
+    """
+    Return dataframe records by matching column values against a pattern
+    :param df: dataframe
+    :param col_name: column that has string values
+    :param one_pattern: regex pattern
+    :return: filtered dataframe
+    """
+    return df[get_mask_for_matching_column_against_pattern(df, col_name, one_pattern)]
+
+
+class LogicalOperator(IntEnum):
+    OR = 0
+    AND = 1
+
+
+def filter_df_records_matching_text_patterns(df: pd.DataFrame, col_name: str,
+                                             text_patterns: List[Union[str, re.Pattern]]) -> pd.DataFrame:
+    """
+    Return dataframe records by matching column values against a list of regex patterns.
+
+    :param df: DataFrame
+    :param col_name: Column name that contains string values.
+    :param text_patterns: List of regex patterns or strings.
+    :return: Filtered DataFrame
+    """
+    if not text_patterns:
+        return df  # Return original df if no patterns provided
+
+    # Create a combined boolean mask
+    mask = df[col_name].astype(str).apply(lambda x: any(re.search(pattern, x.lower()) for pattern in text_patterns))
+    return df[mask]
