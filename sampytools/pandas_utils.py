@@ -2,7 +2,7 @@ import pathlib
 import pandas as pd
 import logging
 import re
-from typing import List, Tuple, Dict, Union
+from typing import List, Tuple, Dict, Union,Any
 from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list, \
     add_new_values_in_certain_item_location
 from enum import IntEnum
@@ -446,3 +446,21 @@ def filter_df_records_matching_text_patterns(df: pd.DataFrame, col_name: str,
     # Create a combined boolean mask
     mask = df[col_name].astype(str).apply(lambda x: any(re.search(pattern, x.lower()) for pattern in text_patterns))
     return df[mask]
+
+
+def list_of_dict_to_dataframe(records: List[Dict[Any, Any]], key_col_name: str=None, value_col_name: str=None)->pd.DataFrame:
+    """
+    Convert a list of dictionaries to dataframe
+    A single dictionary has structure {key_col_name:key_col_val,value_col_name:value_col_val}
+    :param records:
+    :param key_col_name:
+    :param value_col_name:
+    :return:
+    """
+    if key_col_name is None or value_col_name is None:
+        one_record=records[0]
+        key_col_name,value_col_name=tuple(one_record.keys())
+    record_dict = {}
+    for item in records:
+        record_dict[item[key_col_name]] = item[value_col_name]
+    return pd.DataFrame([record_dict])

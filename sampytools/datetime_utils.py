@@ -2,11 +2,13 @@ import pandas as pd
 import numpy as np
 import datetime
 import logging
-from typing import List,Union
+from typing import List, Union
 import datetime
 
-def to_str(adate:Union[datetime.date,datetime.datetime], date_str_format:str)->str:
+
+def to_str(adate: Union[datetime.date, datetime.datetime], date_str_format: str) -> str:
     return datetime.datetime.strftime(adate, date_str_format)
+
 
 def to_yyyymmdd(date):
     return to_str(date, '%Y%m%d')
@@ -78,3 +80,23 @@ def generate_now_str_timestamp():
     :return:
     """
     return datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
+
+
+def get_previous_month_end_from_today(today: datetime.date = None) -> datetime.date:
+    """
+    Get previous month end date from today
+    :param today: today's date
+    :return: previous month end date
+    """
+    if today is None:
+        today = datetime.date.today()
+    return today.replace(day=1) - datetime.timedelta(days=1)
+
+
+def parse_yymmdd(yymmdd: str) -> datetime.datetime:
+    """
+    Parse yymmdd string to datetime
+    :param yymmdd: date string in yymmdd format
+    :return: datetime from string
+    """
+    return datetime.datetime.strptime(str(yymmdd), '%y%m%d')

@@ -22,12 +22,22 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue("User_name" in threedf.columns)
 
     def test_filter_df_records_matching_text_patterns(self):
-        names=["Tesla corporation lakjdljf","NVIDIA corporatation", "TOYOTA MOTORS", "something else"]
-        df=pd.DataFrame({"name":names,"weight":[0.3]*len(names)})
+        names = ["Tesla corporation lakjdljf", "NVIDIA corporatation", "TOYOTA MOTORS", "something else"]
+        df = pd.DataFrame({"name": names, "weight": [0.3] * len(names)})
         from sampytools.pandas_utils import filter_df_records_matching_text_patterns
-        filterdf=filter_df_records_matching_text_patterns(df,"name",["tesla","toy[A-Za-z]ta"])
+        filterdf = filter_df_records_matching_text_patterns(df, "name", ["tesla", "toy[A-Za-z]ta"])
         print(filterdf)
-        self.assertTrue(len(filterdf)>0)
+        self.assertTrue(len(filterdf) > 0)
+
+    def test_list_of_dict_to_dataframe(self):
+        from sampytools.pandas_utils import list_of_dict_to_dataframe
+        records = [{"custdim": "one", "custval": "one value"}, {"custdim": "two", "custval": "two value"}]
+        df = list_of_dict_to_dataframe(records, "custdim", "custval")
+        print(df)
+        self.assertTrue(len(df) > 0)
+        df2=list_of_dict_to_dataframe(records)
+        print(df2)
+        self.assertTrue(len(df2)>0)
 
 
 if __name__ == '__main__':
