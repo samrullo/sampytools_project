@@ -19,8 +19,27 @@ def split_text_by_certain_substring_and_save(long_text, split_str, filepath: pat
     return lines
 
 
-def join_lines_with_keyword(keyword, lines):
+def join_lines_with_keyword(keyword: str, lines: List[str]):
     return f"{keyword}".join(lines)
+
+
+def join_list_to_line(alist: List[str], join_char="\t"):
+    """
+    Join list of strings to a single line with specified join character
+    :param alist:
+    :param join_char:
+    :return:
+    """
+    return f"{join_char}".join(alist)
+
+
+def generate_tab_delimited_line_from_list(alist: List[str]):
+    """
+    Join list of strings to a single line with tab character
+    :param alist: list of strings
+    :return: string of tab delimited line
+    """
+    return join_list_to_line(alist, "\t")
 
 
 def format_sql_query(sql_keywords, query):
