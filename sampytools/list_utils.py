@@ -28,14 +28,14 @@ def generate_comma_separated_text(item_list, with_quote=True):
     return comma_seperated_text
 
 
-def search_list(_list, _text):
+def search_list(_list:List[str], _text:str)->List[str]:
     """
     Get elements of a list that contain certain text
-    :param _list:
-    :param _text:
+    :param _list: list of strings
+    :param _text: string to search in the list
     :return:
     """
-    return [item for item in _list if _text in item]
+    return [item for item in _list if _text.lower() in item.lower()]
 
 
 def get_intersection(list1, list2):
@@ -94,3 +94,12 @@ def add_new_values_in_certain_item_location(orig_list: List[Any], item_val: Unio
         return orig_list[:item_index + 1] + new_vals + orig_list[item_index + 1:]
     else:
         return orig_list[:item_index] + new_vals + orig_list[item_index + 1:]
+
+
+def get_unique_records_from_list(alist: List[Union[str, int, float, Any]]) -> List[Union[str, int, float, Any]]:
+    """
+    Get unique records from a list of strings, integers, floats or any other type
+    :param alist: list of strings or floats or integers or any types
+    :return: unique list of records with order preserved
+    """
+    return list(dict.fromkeys(alist))

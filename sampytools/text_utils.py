@@ -9,6 +9,8 @@ from sklearn.decomposition import NMF
 from sklearn.preprocessing import normalize
 import logging
 
+from sampytools.list_utils import get_list_diff, get_unique_records_from_list
+
 
 def split_text_by_certain_substring_and_save(long_text, split_str, filepath: pathlib.Path):
     lines = long_text.split(split_str)
@@ -188,3 +190,19 @@ def get_message_clusters(messages, n_components=7):
         f"total of {len(clustered_messages)} distinct messages were mapped to {len(set(clustered_messages.values()))} distinct clusters")
     return ConfigDict({'clustered_messages': clustered_messages, 'tfidf': tfidf, 'tfidf_features': tfidf_features,
                        'tokenizer': tokenizer, 'nmf_feature': nmf_features})
+
+
+def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path):
+    """
+    Compare two files and return the lines that are different
+    :param file_one:
+    :param file_two:
+    :return: differences between two files as config dict
+    """
+    lines_one = get_unique_records_from_list(file_one.read_text().split("\n"))
+    lines_two = get_unique_records_from_list(file_two.read_text().split("\n"))
+    file1_vs_file2 = get_list_diff(lines_one, lines_two)
+    logging.info(f"{file_one.name} vs {file_two.name} diff : {len(file1_vs_file2)} lines")
+    file2_vs_file1 = get_list_diff(lines_two, lines_one)
+    logging.info(f"{file_two.name} vs {file_one.name} diff : {len(file2_vs_file1)} lines")
+    return ConfigDict({"file1_vs_file2": file1_vs_file2, "file2_vs_file1": file2_vs_file1})
