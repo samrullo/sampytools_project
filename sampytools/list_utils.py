@@ -1,5 +1,6 @@
 import itertools
-from typing import List, Any, Dict, Union
+from collections import Counter
+from typing import List, Tuple, Any, Dict, Union
 
 
 def flatten_list_of_lists(list_of_lists):
@@ -28,7 +29,7 @@ def generate_comma_separated_text(item_list, with_quote=True):
     return comma_seperated_text
 
 
-def search_list(_list:List[str], _text:str)->List[str]:
+def search_list(_list: List[str], _text: str) -> List[str]:
     """
     Get elements of a list that contain certain text
     :param _list: list of strings
@@ -103,3 +104,24 @@ def get_unique_records_from_list(alist: List[Union[str, int, float, Any]]) -> Li
     :return: unique list of records with order preserved
     """
     return list(dict.fromkeys(alist))
+
+
+def get_field_counts_of_records(list_of_records: List[List[str]]) -> Counter:
+    """
+    return field counts of records in a list of records
+    :param list_of_records:
+    :return:
+    """
+    return Counter([len(record) for record in list_of_records])
+
+
+def get_dupe_and_nondupe_items_from_list(alist: List[str]) -> Tuple[List[str], List[str]]:
+    """
+    Get duplicate and non-duplicate items from a list
+    :param alist:
+    :return:
+    """
+    cnt = Counter(alist)
+    dupe_items = [item for item, count in cnt.items() if count > 1]
+    nondupe_items = [item for item, count in cnt.items() if count == 1]
+    return dupe_items, nondupe_items
