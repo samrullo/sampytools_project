@@ -220,7 +220,7 @@ def get_delimited_records_from_file(afile: pathlib.Path, delimiter: str = "\t", 
     """
     text = afile.read_text(encoding=encoding)
     lines = text.split("\n")
-    return [line.split(delimiter) for line in lines]
+    return [line.strip().split(delimiter) for line in lines]
 
 
 def remove_items_with_certain_val_from_list(alist: List[str], string_to_remove: str = "") -> List[str]:
