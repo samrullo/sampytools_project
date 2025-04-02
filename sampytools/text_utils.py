@@ -192,7 +192,7 @@ def get_message_clusters(messages, n_components=7):
                        'tokenizer': tokenizer, 'nmf_feature': nmf_features})
 
 
-def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path)->ConfigDict:
+def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path) -> ConfigDict:
     """
     Compare two files and return the lines that are different
     :param file_one:
@@ -205,9 +205,11 @@ def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path)->ConfigDic
     logging.info(f"{file_one.name} vs {file_two.name} diff : {len(file1_vs_file2)} lines")
     file2_vs_file1 = get_list_diff(file_two_lines, file_one_lines)
     logging.info(f"{file_two.name} vs {file_one.name} diff : {len(file2_vs_file1)} lines")
-    file1_file2_intersection = get_intersection(file_one_lines,file_two_lines)
+    file1_file2_intersection = get_intersection(file_one_lines, file_two_lines)
     logging.info(f"{file_one.name} and {file_two.name} intersection : {len(file1_file2_intersection)} lines")
-    return ConfigDict({"file1_vs_file2": file1_vs_file2, "file2_vs_file1": file2_vs_file1,"file1_lines":file_one_lines,"file2_lines":file_two_lines,"intersection":file1_file2_intersection})
+    return ConfigDict(
+        {"file1_vs_file2": file1_vs_file2, "file2_vs_file1": file2_vs_file1, "file1_lines": file_one_lines,
+         "file2_lines": file_two_lines, "intersection": file1_file2_intersection})
 
 
 def get_delimited_records_from_file(afile: pathlib.Path, delimiter: str = "\t", encoding="utf-8") -> List[List[str]]:
@@ -219,7 +221,7 @@ def get_delimited_records_from_file(afile: pathlib.Path, delimiter: str = "\t", 
     :return: list of lists
     """
     text = afile.read_text(encoding=encoding)
-    lines = text.split("\n")
+    lines = [line for line in text.split("\n") if line != ""]
     return [line.strip().split(delimiter) for line in lines]
 
 
