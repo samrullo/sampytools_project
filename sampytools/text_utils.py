@@ -76,7 +76,7 @@ def combine_lines_to_string(lines, join_char="\n"):
 
 def extract_switches_values(text):
     """
-    why are we wrapping the part before \s+ in parantheses
+    why are we wrapping the part before \\s+ in parantheses
     The parentheses are used to define a capturing group in the regular expression. A capturing group captures the text matched by the group for later use, such as extracting it as a separate item from the match.
     In this case, the first capturing group (-[a-zA-Z]+) matches the switch, which begins with a hyphen and is followed by one or more letters. The second capturing group (\S+) matches the value that follows the switch, which is one or more non-whitespace characters.
     By wrapping each of these parts in a capturing group, we can extract both the switch and its value as separate items from each match. The re.findall function returns a list of all matches, where each match is a tuple of the capturing groups' values in the order they are defined in the pattern.

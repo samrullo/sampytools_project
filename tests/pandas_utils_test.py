@@ -1,9 +1,19 @@
 import unittest
+import pathlib
+
+from sampytools.list_utils import get_list_diff
+
 from sampytools.pandas_utils import extract_dict_keys_to_columns
 import pandas as pd
 
 
 class MyTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Setup code here
+        print("Setup before any tests")
+        cls.test_folder = pathlib.Path.cwd() / "test_data"
+
     def test_extract_dict_keys_to_columns(self):
         df = pd.DataFrame(data={"col_one": ["lksdjf"] * 3,
                                 "col_two": ["lakdsjf"] * 3,
@@ -38,6 +48,19 @@ class MyTestCase(unittest.TestCase):
         df2=list_of_dict_to_dataframe(records)
         print(df2)
         self.assertTrue(len(df2)>0)
+
+    def test_order_merged_dataframe_cols(self):
+        from sampytools.pandas_utils import order_merged_dataframe_cols
+        file=self.test_folder/"pos.csv"
+        onedf=pd.read_csv(file)
+        twodf=pd.read_csv(file)
+        twodf["quantity"]=twodf["quantity"]*2
+        mrgdf=pd.merge(left=onedf,right=twodf,how="left",on=["portfolio","asset_id"],suffixes=("_one","_two"))
+        print(f"mrgdf before ordering:\n{mrgdf.to_string()}")
+        mrgdf=order_merged_dataframe_cols(mrgdf,["portfolio","asset_id"],get_list_diff(onedf.columns,["portfolio","asset_id"]),("_one","_two"))
+        print(f"mrgdf after ordering:\n{mrgdf.to_string()}")
+        self.assertTrue(len(mrgdf)==2)
+
 
 
 if __name__ == '__main__':

@@ -123,17 +123,17 @@ def group_count_sort_series(df, group_cols, count_column, ascending=False):
     return df.groupby(group_cols)[count_column].count().sort_values(ascending=ascending)
 
 
-def order_merged_dataframe_cols(mrg_df, index_col, mrg_cols, suffixes):
+def order_merged_dataframe_cols(mrg_df:pd.DataFrame, index_cols:List[str], mrg_cols:List[str], suffixes:Tuple[str,str])->pd.DataFrame:
     """
     Order columns of the merged dataframe so that relevant columns appear side by side
-    :param mrg_df:
-    :param index_col:
-    :param mrg_cols:
-    :param suffixes:
-    :return:
+    :param mrg_df: dataframe that is the result of merging two dataframes with identical columns
+    :param index_cols: index columns used when merging two dataframes
+    :param mrg_cols: columns that have suffixes appended to them
+    :param suffixes: suffixes used when merging two dataframes
+    :return: merged dataframes with columns ordered
     """
     suffix_x, suffix_y = suffixes
-    ordered_cols = [index_col]
+    ordered_cols = index_cols
     for col in mrg_cols:
         ordered_cols.append(col + suffix_x)
         ordered_cols.append(col + suffix_y)
