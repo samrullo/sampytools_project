@@ -61,6 +61,12 @@ class MyTestCase(unittest.TestCase):
         print(f"mrgdf after ordering:\n{mrgdf.to_string()}")
         self.assertTrue(len(mrgdf)==2)
 
+    def test_print_df_header(self):
+        df=pd.DataFrame({"col_one":[1,2,3],"col_two":[4,5,6]})
+        from sampytools.pandas_utils import print_df_header
+        print_df_header(df)
+        self.assertTrue(len(df)>0)
+
 
 
 if __name__ == '__main__':

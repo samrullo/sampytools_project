@@ -16,6 +16,14 @@ class MyTestCase(unittest.TestCase):
         print(dupelist)
         self.assertEqual(len(dupelist), 1)
 
+    def test_get_list_diff(self):
+        from sampytools.list_utils import get_list_diff
+        list_one = ["one", "two", "three","five","seven","four"]
+        list_two = ["one", "two"]
+        diff = get_list_diff(list_one, list_two)
+        print(diff)
+        self.assertTrue(len(diff)==4)
+
 
 if __name__ == '__main__':
     unittest.main()

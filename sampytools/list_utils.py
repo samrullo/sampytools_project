@@ -50,7 +50,7 @@ def get_intersection(list1, list2):
     return list(set(list1) & set(list2))
 
 
-def get_list_diff(list1, list2):
+def get_list_diff(list1:list, list2:list):
     """
     Get difference between two lists
     This return elements form list1 that are not in list2
@@ -58,7 +58,8 @@ def get_list_diff(list1, list2):
     :param list2:
     :return:
     """
-    return list(set(list1) - set(list2))
+    return list(dict.fromkeys(item for item in list1 if item not in set(list2)))
+
 
 
 def print_list_items(mylist):

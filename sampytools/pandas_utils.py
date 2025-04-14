@@ -464,3 +464,16 @@ def list_of_dict_to_dataframe(records: List[Dict[Any, Any]], key_col_name: str=N
     for item in records:
         record_dict[item[key_col_name]] = item[value_col_name]
     return pd.DataFrame([record_dict])
+
+
+def print_df_header(df:pd.DataFrame, no_of_head_rows:int=5, cols:List[str]=None):
+    """
+    Print dataframe header
+    :param df:
+    :param no_of_head_rows: number of head rows to print
+    :param cols:
+    :return:
+    """
+    if cols is None:
+        cols = df.columns.tolist()
+    print(df[cols].head(no_of_head_rows).to_string())
