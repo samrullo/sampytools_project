@@ -18,11 +18,19 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_list_diff(self):
         from sampytools.list_utils import get_list_diff
-        list_one = ["one", "two", "three","five","seven","four"]
+        list_one = ["one", "two", "three", "five", "seven", "four"]
         list_two = ["one", "two"]
         diff = get_list_diff(list_one, list_two)
         print(diff)
-        self.assertTrue(len(diff)==4)
+        self.assertTrue(len(diff) == 4)
+
+    def test_get_intersection(self):
+        from sampytools.list_utils import get_intersection
+        list_one = ["one", "two", "three", "five", "seven", "four"]
+        list_two = ["one", "two"]
+        intersect = get_intersection(list_one, list_two)
+        print(f"intersection : {intersect}")
+        self.assertTrue(len(intersect) == 2)
 
 
 if __name__ == '__main__':

@@ -47,7 +47,8 @@ def get_intersection(list1, list2):
     :param list2:
     :return:
     """
-    return list(set(list1) & set(list2))
+    set2 = set(list2)
+    return list(dict.fromkeys(item for item in list1 if item in set2))
 
 
 def get_list_diff(list1:list, list2:list):
