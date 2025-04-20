@@ -74,6 +74,14 @@ class MyTestCase(unittest.TestCase):
         print(df)
         self.assertTrue(len(df)>0)
 
+    def test_convert_columns_to_lowercase_and_nowhitespace(self):
+        from sampytools.pandas_utils import convert_columns_to_lowercase_and_nowhitespace
+        df=pd.DataFrame({"Cusip":["one","two","three"],"Market Value":[123,234,345]})
+        print(f"df before : {df.to_string()}")
+        df=convert_columns_to_lowercase_and_nowhitespace(df)
+        print(f"df after : {df.to_string()}")
+        self.assertTrue("market_value" in df.columns)
+
 
 
 if __name__ == '__main__':

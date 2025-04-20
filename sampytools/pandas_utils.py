@@ -245,7 +245,7 @@ def convert_columns_to_str(df: pd.DataFrame, str_columns: List[str] = None) -> p
     return df
 
 
-def convert_columns_to_lowercase_and_nowhitespace(df: pd.DataFrame, join_char: str = ".") -> pd.DataFrame:
+def convert_columns_to_lowercase_and_nowhitespace(df: pd.DataFrame, join_char: str = "_") -> pd.DataFrame:
     """
     Remove punctuation marks from column names and convert column names to lowercase
     :param df:
