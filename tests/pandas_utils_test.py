@@ -67,6 +67,13 @@ class MyTestCase(unittest.TestCase):
         print_df_header(df)
         self.assertTrue(len(df)>0)
 
+    def test_remove_nonnumeric_chars_from_numeric_cols(self):
+        from sampytools.pandas_utils import remove_nonnumeric_chars_from_numeric_cols
+        df=pd.DataFrame({"mv":["123,456","234,567","345,765"]})
+        df=remove_nonnumeric_chars_from_numeric_cols(df)
+        print(df)
+        self.assertTrue(len(df)>0)
+
 
 
 if __name__ == '__main__':

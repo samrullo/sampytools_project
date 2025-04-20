@@ -477,3 +477,21 @@ def print_df_header(df:pd.DataFrame, no_of_head_rows:int=5, cols:List[str]=None)
     if cols is None:
         cols = df.columns.tolist()
     print(df[cols].head(no_of_head_rows).to_string())
+
+
+def remove_nonnumeric_chars_from_numeric_cols(df:pd.DataFrame,nonnumeric_chars:List[str]=None, numeric_cols:List[str]=None)->pd.DataFrame:
+    """
+    remove non numeric chars from values of numeric cols to prepare them for conversion
+    :param df: dataframe with numeric cols
+    :param nonnumeric_chars: non numeric chars like comma
+    :param numeric_cols: numeric column names
+    :return:
+    """
+    if nonnumeric_chars is None:
+        nonnumeric_chars=[","]
+    if numeric_cols is None:
+        numeric_cols=df.columns.tolist()
+    for col in numeric_cols:
+        for non_numeric_char in nonnumeric_chars:
+            df[col]=df[col].fillna("").apply(str).map(lambda numeric_col : numeric_col.replace(non_numeric_char,""))
+    return df
