@@ -1,5 +1,6 @@
 import unittest
 import pathlib
+import pandas as pd
 
 
 class MyTestCase(unittest.TestCase):
@@ -36,6 +37,17 @@ class MyTestCase(unittest.TestCase):
         print(diffres.file1_vs_file2)
         print(diffres.intersection)
         self.assertTrue(len(diffres.file1_vs_file2) == 1)
+
+    def test_save_lines_to_file(self):
+        from sampytools.text_utils import save_lines_to_file
+        line_one="portfolio_name,cusip,weight"
+        line_two="ABC123,CUSIP00,0.5"
+        folder=pathlib.Path.cwd()/"test_data"
+        file="test_file.csv"
+        save_lines_to_file(folder/file, [line_one,line_two], encoding="utf-8")
+        df=pd.read_csv(folder/file)
+        print(df.to_string())
+        self.assertTrue("portfolio_name" in df.columns)
 
 
 if __name__ == '__main__':

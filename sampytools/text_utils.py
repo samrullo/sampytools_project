@@ -65,8 +65,8 @@ def extract_lines_that_match_pattern(lines: List[str], thepattern, match_value: 
     return filtered_lines
 
 
-def save_lines_to_file(file: pathlib.Path, lines: List):
-    file.write_text("\n".join(lines))
+def save_lines_to_file(file: pathlib.Path, lines: List,encoding:str="utf-8"):
+    file.write_text("\n".join(lines),encoding=encoding)
     logging.info(f"Saved {len(lines)} lines to {file}")
 
 
