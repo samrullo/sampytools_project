@@ -164,7 +164,7 @@ def get_message_clusters(messages, n_components=7):
     logging.info(f"sparce matrix shape : {csr_mat.shape}")
 
     # tfidf features (tokens) across all messages
-    tfidf_features = tfidf.get_feature_names()
+    tfidf_features = tfidf.get_feature_names_out()
     logging.info(f"there are total of {len(tfidf_features)} tfidf features for specified messages")
 
     # NMF to reduce csr_matr dimensionality to principal components

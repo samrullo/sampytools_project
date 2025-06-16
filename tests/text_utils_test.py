@@ -49,6 +49,45 @@ class MyTestCase(unittest.TestCase):
         print(df.to_string())
         self.assertTrue("portfolio_name" in df.columns)
 
+    def test_get_message_clusters(self):
+        from sampytools.text_utils import get_message_clusters
+
+        # Mock version of `get_common_common_part_of_message_across_documents`
+        def mock_get_common_common_part_of_message_across_documents(msg, tokenizer, vec, features, topk):
+            # Return the first token in message for simplicity
+            tokens = tokenizer(msg)
+            return tokens[0] if tokens else msg
+
+        # Inject the mock function (you can patch it if needed)
+        import sampytools.text_utils
+        sampytools.text_utils.get_common_common_part_of_message_across_documents = mock_get_common_common_part_of_message_across_documents
+
+        # Example messages with near-duplicates to ensure clustering
+        messages = [
+            "Error while reading file /data/abc.txt",
+            "Error while reading file /data/xyz.txt",
+            "Connection to database failed at port 5432",
+            "Database connection failed on port 5432",
+            "User login failed due to wrong credentials",
+            "Login failed: invalid username or password"
+        ]
+
+        result = get_message_clusters(messages, n_components=3)
+
+        clustered_messages = result['clustered_messages']
+        tfidf_features = result['tfidf_features']
+        tokenizer = result['tokenizer']
+        nmf_features = result['nmf_feature']
+
+        # Assertions
+        self.assertIsInstance(clustered_messages, dict)
+        self.assertGreaterEqual(len(clustered_messages), 2)
+        self.assertTrue(all(msg in messages for msg in clustered_messages.keys()))
+        self.assertTrue(hasattr(tokenizer, '__call__'))
+        self.assertEqual(nmf_features.shape[0], len(messages))
+        self.assertEqual(len(tfidf_features), result['tfidf'].idf_.shape[0])
+
+
 
 if __name__ == '__main__':
     unittest.main()
