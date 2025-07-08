@@ -82,6 +82,36 @@ class MyTestCase(unittest.TestCase):
         print(f"df after : {df.to_string()}")
         self.assertTrue("market_value" in df.columns)
 
+    def test_diff_df_maker(self):
+        from sampytools.pandas_utils import diff_df_maker  # Adjust import if needed
+
+        # Simulated merged DataFrame with suffixes _x and _y
+        df = pd.DataFrame({
+            "id": [1, 2, 3],
+            "value_x": [100, 200, 300],
+            "value_y": [90, 210, 290],
+            "category_x": ["A", "B", "C"],
+            "category_y": ["A", "B", "D"]
+        })
+
+        # Base columns before merge
+        cols = ["id", "value", "category"]
+        diff_cols = ["value"]
+        index = ["id"]  # now a list
+        result_df = diff_df_maker(df.copy(), cols, diff_cols, index=index)
+
+        print(result_df.to_string())
+
+        # Assertions
+        self.assertIn("diff_value", result_df.columns)
+        self.assertIn("abs_diff_value", result_df.columns)
+        self.assertIn("diff_value_pct", result_df.columns)
+        self.assertIn("abs_diff_value_pct", result_df.columns)
+        self.assertEqual(len(result_df), 3)
+        self.assertAlmostEqual(result_df["diff_value"].iloc[0], 10)
+        self.assertAlmostEqual(result_df["abs_diff_value_pct"].iloc[1], abs((200 / 210 - 1) * 100))
+
+
 
 
 if __name__ == '__main__':

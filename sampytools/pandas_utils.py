@@ -79,35 +79,41 @@ def convert_columns_to_numeric(df: pd.DataFrame, numeric_columns: List[str], fil
     return df
 
 
-def diff_df_maker(df: pd.DataFrame, cols: List[str], diff_cols: List[str], index: str,
+def diff_df_maker(df: pd.DataFrame, cols: List[str], diff_cols: List[str], index: List[str],
                   suffixes: Tuple[str, str] = ('_x', '_y')) -> pd.DataFrame:
     """
-    Compare values of related columns in a merged dataframe by taking difference, absolute difference and ratio
-    :param df: dataframe
-    :param cols: list of column names before merging two dataframes
-    :param diff_cols: list of numeric columns names that need to be compared
-    :param index: the column name on which two dataframes were merged
-    :param suffixes: tuple suffixes that were used when merging two dataframes
-    :return: dataframe with comparison
+    Compare values of related columns in a merged dataframe by taking difference, absolute difference, and ratio.
+
+    :param df: Merged DataFrame
+    :param cols: List of base column names before merging
+    :param diff_cols: List of numeric column names to compare
+    :param index: List of index column names on which the two DataFrames were merged
+    :param suffixes: Tuple of suffixes used in the merge (default is ('_x', '_y'))
+    :return: DataFrame with selected columns and calculated differences
     """
     write_cols = []
-    if not isinstance(index, list):
-        index = [index]
+
     for col in cols:
         if col in index:
             write_cols.append(col)
         else:
-            write_cols.append(col + suffixes[0])
-            write_cols.append(col + suffixes[1])
+            col_x = col + suffixes[0]
+            col_y = col + suffixes[1]
+            write_cols.extend([col_x, col_y])
+
             if col in diff_cols:
-                write_cols.append('diff_' + col)
-                write_cols.append('diff_' + col + '_pct')
-                write_cols.append('abs_diff_' + col)
-                write_cols.append('abs_diff_' + col + '_pct')
-                df['diff_' + col] = df[col + suffixes[0]] - df[col + suffixes[1]]
-                df['diff_' + col + '_pct'] = (df[col + suffixes[0]] / df[col + suffixes[1]] - 1) * 100
-                df['abs_diff_' + col] = abs(df[col + suffixes[0]] - df[col + suffixes[1]])
-                df['abs_diff_' + col + '_pct'] = abs((df[col + suffixes[0]] / df[col + suffixes[1]] - 1) * 100)
+                diff_col = f'diff_{col}'
+                diff_pct_col = f'diff_{col}_pct'
+                abs_diff_col = f'abs_diff_{col}'
+                abs_diff_pct_col = f'abs_diff_{col}_pct'
+
+                df[diff_col] = df[col_x] - df[col_y]
+                df[diff_pct_col] = (df[col_x] / df[col_y] - 1) * 100
+                df[abs_diff_col] = abs(df[diff_col])
+                df[abs_diff_pct_col] = abs(df[diff_pct_col])
+
+                write_cols.extend([diff_col, diff_pct_col, abs_diff_col, abs_diff_pct_col])
+
     return df[write_cols].copy()
 
 
