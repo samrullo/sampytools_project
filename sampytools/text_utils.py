@@ -283,3 +283,12 @@ def remove_items_with_certain_val_from_list(
     :return: list of strings
     """
     return [item for item in alist if item != string_to_remove]
+
+def extract_words_from_text_and_join_with_char(text:str,join_char:str="_")->str:
+    """
+    Extract words from text and join them with specified character
+    :param text:
+    :param join_char:
+    :return:
+    """
+    return f"{join_char}".join(re.findall(r"\w+",text))
