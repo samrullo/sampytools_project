@@ -567,3 +567,16 @@ def remove_nonnumeric_chars_from_numeric_cols(
         df[col] = df[col].astype(str).str.replace(r"[^0-9.-]", "", regex=True)
 
     return df
+
+def create_new_col_based_on_dict(df: pd.DataFrame, col_name: str, new_col_name: str, mapping_dict: dict) -> pd.DataFrame:
+    """
+    Create a new column by mapping existing column values to dictionary values.
+
+    :param df: Input DataFrame
+    :param col_name: Column name to map from
+    :param new_col_name: Name of the new column
+    :param mapping_dict: Dictionary for mapping
+    :return: DataFrame with the new mapped column
+    """
+    df[new_col_name] = df[col_name].map(lambda item: mapping_dict.get(item, item))
+    return df
