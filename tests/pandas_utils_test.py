@@ -5,7 +5,7 @@ from sampytools.list_utils import get_list_diff
 
 from sampytools.pandas_utils import extract_dict_keys_to_columns
 import pandas as pd
-
+from sampytools.pandas_utils import remove_nonnumeric_chars_from_numeric_cols
 
 class MyTestCase(unittest.TestCase):
     @classmethod
@@ -105,13 +105,29 @@ class MyTestCase(unittest.TestCase):
         print_df_header(df)
         self.assertTrue(len(df) > 0)
 
-    def test_remove_nonnumeric_chars_from_numeric_cols(self):
-        from sampytools.pandas_utils import remove_nonnumeric_chars_from_numeric_cols
-
+    def test_remove_nonnumeric_chars_from_numeric_cols_basic(self):
         df = pd.DataFrame({"mv": ["123,456", "234,567", "345,765"]})
-        df = remove_nonnumeric_chars_from_numeric_cols(df)
-        print(df)
-        self.assertTrue(len(df) > 0)
+        result_df = remove_nonnumeric_chars_from_numeric_cols(df, numeric_cols=["mv"])
+        expected_df = pd.DataFrame({"mv": ["123456", "234567", "345765"]})
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_remove_nonnumeric_chars_from_numeric_cols_multiple_columns(self):
+        df = pd.DataFrame({
+            "mv": ["123,456", "$234,567", "€345,765"],
+            "price": ["$1,234.56", "$2,345.67", "$3,456.78"]
+        })
+        result_df = remove_nonnumeric_chars_from_numeric_cols(df, numeric_cols=["mv", "price"])
+        expected_df = pd.DataFrame({
+            "mv": ["123456", "234567", "345765"],
+            "price": ["1234.56", "2345.67", "3456.78"]
+        })
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_remove_nonnumeric_chars_handles_nan(self):
+        df = pd.DataFrame({"mv": ["123,456", None, "345,765"]})
+        result_df = remove_nonnumeric_chars_from_numeric_cols(df, numeric_cols=["mv"])
+        expected_df = pd.DataFrame({"mv": ["123456", "", "345765"]})
+        pd.testing.assert_frame_equal(result_df, expected_df)
 
     def test_convert_columns_to_lowercase_and_nowhitespace(self):
         from sampytools.pandas_utils import (

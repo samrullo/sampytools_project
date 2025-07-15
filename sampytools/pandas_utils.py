@@ -551,25 +551,19 @@ def print_df_header(df: pd.DataFrame, no_of_head_rows: int = 5, cols: List[str] 
 
 
 def remove_nonnumeric_chars_from_numeric_cols(
-    df: pd.DataFrame, nonnumeric_chars: List[str] = None, numeric_cols: List[str] = None
+    df: pd.DataFrame, numeric_cols: List[str] = None
 ) -> pd.DataFrame:
     """
-    remove non numeric chars from values of numeric cols to prepare them for conversion
-    :param df: dataframe with numeric cols
-    :param nonnumeric_chars: non numeric chars like comma
-    :param numeric_cols: numeric column names
-    :return:
+    Remove all non-numeric characters from values of numeric columns.
+
+    :param df: DataFrame containing numeric columns
+    :param numeric_cols: List of column names to clean. Defaults to all columns.
+    :return: DataFrame with cleaned numeric columns
     """
-    if nonnumeric_chars is None:
-        nonnumeric_chars = [","]
     if numeric_cols is None:
         numeric_cols = df.columns.tolist()
+
     for col in numeric_cols:
-        for non_numeric_char in nonnumeric_chars:
-            df[col] = (
-                df[col]
-                .fillna("")
-                .apply(str)
-                .map(lambda numeric_col: numeric_col.replace(non_numeric_char, ""))
-            )
+        df[col] = df[col].astype(str).str.replace(r"[^0-9.-]", "", regex=True)
+
     return df
