@@ -9,10 +9,16 @@ from sklearn.decomposition import NMF
 from sklearn.preprocessing import normalize
 import logging
 
-from sampytools.list_utils import get_list_diff, get_unique_records_from_list, get_intersection
+from sampytools.list_utils import (
+    get_list_diff,
+    get_unique_records_from_list,
+    get_intersection,
+)
 
 
-def split_text_by_certain_substring_and_save(long_text, split_str, filepath: pathlib.Path):
+def split_text_by_certain_substring_and_save(
+    long_text, split_str, filepath: pathlib.Path
+):
     lines = long_text.split(split_str)
     filepath.write_text("\n\n".join(lines))
     for line in lines:
@@ -54,14 +60,18 @@ def format_sql_query(sql_keywords, query):
 def extract_subtext_from_big_text(big_text_lines, line_one, line_two):
     start_idx = big_text_lines.index(line_one)
     end_idx = big_text_lines.index(line_two)
-    return big_text_lines[start_idx:end_idx + 1]
+    return big_text_lines[start_idx : end_idx + 1]
 
 
-def extract_lines_that_match_pattern(lines: List[str], thepattern, match_value: str) -> List[str]:
+def extract_lines_that_match_pattern(
+    lines: List[str], thepattern, match_value: str
+) -> List[str]:
     """
     Extract lines matching certain pattern from list of lines
     """
-    filtered_lines = [line for line in lines if re.search(thepattern, line).group() == match_value]
+    filtered_lines = [
+        line for line in lines if re.search(thepattern, line).group() == match_value
+    ]
     return filtered_lines
 
 
@@ -84,12 +94,14 @@ def extract_switches_values(text):
     :param text:
     :return:
     """
-    switch_value_regex = re.compile(r'(-[a-zA-Z]+)\s+(\S+)')
+    switch_value_regex = re.compile(r"(-[a-zA-Z]+)\s+(\S+)")
     switches_values = switch_value_regex.findall(text)
     return dict(switches_values)
 
 
-def remove_duplicate_lines_in_text(original_file: pathlib.Path, refined_filename: str = None, save_results=True):
+def remove_duplicate_lines_in_text(
+    original_file: pathlib.Path, refined_filename: str = None, save_results=True
+):
     """
     Remove duplicate lines in the file and save it to the same folder with new filename
     :param original_file:
@@ -105,11 +117,15 @@ def remove_duplicate_lines_in_text(original_file: pathlib.Path, refined_filename
     cnt = Counter(lines)
     new_file = log_folder / refined_filename
     new_file.write_text("\n".join(cnt.keys()))
-    logging.info(f"reduced number of lines in {original_file} from {len(lines)} to {len(cnt)}")
+    logging.info(
+        f"reduced number of lines in {original_file} from {len(lines)} to {len(cnt)}"
+    )
     return ConfigDict({"new_file": new_file, "newtxtcnt": cnt})
 
 
-def get_sorted_non_zero_words_and_freqs_from_csr_mat_row(csr_matrix_row, tfidf_features):
+def get_sorted_non_zero_words_and_freqs_from_csr_mat_row(
+    csr_matrix_row, tfidf_features
+):
     """
     csr_matrix which is the result of transforming messages into word frquencies by TfidfVectorizer
     has zeros across many columns and non-zero values only for limited columns where the message
@@ -119,13 +135,18 @@ def get_sorted_non_zero_words_and_freqs_from_csr_mat_row(csr_matrix_row, tfidf_f
     :param tfidf_features:
     :return:
     """
-    items = [(w, csr_matrix_row[0, idx]) for idx, w in enumerate(tfidf_features) if csr_matrix_row[0, idx] > 0]
+    items = [
+        (w, csr_matrix_row[0, idx])
+        for idx, w in enumerate(tfidf_features)
+        if csr_matrix_row[0, idx] > 0
+    ]
     items = sorted(items, key=lambda item: item[-1])
     return items
 
 
-def get_common_common_part_of_message_across_documents(message, tokenizer, csr_matrix_row, tfidf_features,
-                                                       throw_off_thresh=1):
+def get_common_common_part_of_message_across_documents(
+    message, tokenizer, csr_matrix_row, tfidf_features, throw_off_thresh=1
+):
     """
     We are assuming a use case where we have lots of similar messages that differ only by one or two words
     We want this function to return common part across these similar messages
@@ -137,9 +158,11 @@ def get_common_common_part_of_message_across_documents(message, tokenizer, csr_m
     :return:
     """
     tokens = tokenizer(message)
-    words_and_freqs = get_sorted_non_zero_words_and_freqs_from_csr_mat_row(csr_matrix_row, tfidf_features)
+    words_and_freqs = get_sorted_non_zero_words_and_freqs_from_csr_mat_row(
+        csr_matrix_row, tfidf_features
+    )
     words_and_freqs = sorted(words_and_freqs, key=lambda item: item[-1])
-    words_and_freqs = words_and_freqs[:-1 * throw_off_thresh]
+    words_and_freqs = words_and_freqs[: -1 * throw_off_thresh]
     words = [word for (word, freq) in words_and_freqs]
     return " ".join([token for token in tokens if token.lower() in words])
 
@@ -165,7 +188,9 @@ def get_message_clusters(messages, n_components=7):
 
     # tfidf features (tokens) across all messages
     tfidf_features = tfidf.get_feature_names()
-    logging.info(f"there are total of {len(tfidf_features)} tfidf features for specified messages")
+    logging.info(
+        f"there are total of {len(tfidf_features)} tfidf features for specified messages"
+    )
 
     # NMF to reduce csr_matr dimensionality to principal components
     nmf = NMF(n_components=n_components)
@@ -179,17 +204,26 @@ def get_message_clusters(messages, n_components=7):
 
     for idx, message in enumerate(messages):
         if message not in clustered_messages:
-            essential_part = get_common_common_part_of_message_across_documents(message, tokenizer, csr_mat[idx],
-                                                                                tfidf_features, 1)
+            essential_part = get_common_common_part_of_message_across_documents(
+                message, tokenizer, csr_mat[idx], tfidf_features, 1
+            )
             similarities = norm_nmf_features.dot(norm_nmf_features[idx, :])
             for msg_idx, similarity in enumerate(similarities):
                 if similarity > 0.9:
                     clustered_messages[messages[msg_idx]] = essential_part
 
     logging.info(
-        f"total of {len(clustered_messages)} distinct messages were mapped to {len(set(clustered_messages.values()))} distinct clusters")
-    return ConfigDict({'clustered_messages': clustered_messages, 'tfidf': tfidf, 'tfidf_features': tfidf_features,
-                       'tokenizer': tokenizer, 'nmf_feature': nmf_features})
+        f"total of {len(clustered_messages)} distinct messages were mapped to {len(set(clustered_messages.values()))} distinct clusters"
+    )
+    return ConfigDict(
+        {
+            "clustered_messages": clustered_messages,
+            "tfidf": tfidf,
+            "tfidf_features": tfidf_features,
+            "tokenizer": tokenizer,
+            "nmf_feature": nmf_features,
+        }
+    )
 
 
 def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path) -> ConfigDict:
@@ -202,17 +236,31 @@ def compare_two_files(file_one: pathlib.Path, file_two: pathlib.Path) -> ConfigD
     file_one_lines = get_unique_records_from_list(file_one.read_text().split("\n"))
     file_two_lines = get_unique_records_from_list(file_two.read_text().split("\n"))
     file1_vs_file2 = get_list_diff(file_one_lines, file_two_lines)
-    logging.info(f"{file_one.name} vs {file_two.name} diff : {len(file1_vs_file2)} lines")
+    logging.info(
+        f"{file_one.name} vs {file_two.name} diff : {len(file1_vs_file2)} lines"
+    )
     file2_vs_file1 = get_list_diff(file_two_lines, file_one_lines)
-    logging.info(f"{file_two.name} vs {file_one.name} diff : {len(file2_vs_file1)} lines")
+    logging.info(
+        f"{file_two.name} vs {file_one.name} diff : {len(file2_vs_file1)} lines"
+    )
     file1_file2_intersection = get_intersection(file_one_lines, file_two_lines)
-    logging.info(f"{file_one.name} and {file_two.name} intersection : {len(file1_file2_intersection)} lines")
+    logging.info(
+        f"{file_one.name} and {file_two.name} intersection : {len(file1_file2_intersection)} lines"
+    )
     return ConfigDict(
-        {"file1_vs_file2": file1_vs_file2, "file2_vs_file1": file2_vs_file1, "file1_lines": file_one_lines,
-         "file2_lines": file_two_lines, "intersection": file1_file2_intersection})
+        {
+            "file1_vs_file2": file1_vs_file2,
+            "file2_vs_file1": file2_vs_file1,
+            "file1_lines": file_one_lines,
+            "file2_lines": file_two_lines,
+            "intersection": file1_file2_intersection,
+        }
+    )
 
 
-def get_delimited_records_from_file(afile: pathlib.Path, delimiter: str = "\t", encoding="utf-8") -> List[List[str]]:
+def get_delimited_records_from_file(
+    afile: pathlib.Path, delimiter: str = "\t", encoding="utf-8"
+) -> List[List[str]]:
     """
     Get delimited records from a file with lines that are delimited by some character like tab
     :param afile: filepath
@@ -225,7 +273,9 @@ def get_delimited_records_from_file(afile: pathlib.Path, delimiter: str = "\t", 
     return [line.strip().split(delimiter) for line in lines]
 
 
-def remove_items_with_certain_val_from_list(alist: List[str], string_to_remove: str = "") -> List[str]:
+def remove_items_with_certain_val_from_list(
+    alist: List[str], string_to_remove: str = ""
+) -> List[str]:
     """
     Remove items with certain value from list
     :param alist: list of strings

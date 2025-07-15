@@ -12,13 +12,17 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_delimited_records_from_file(self):
         from sampytools.text_utils import get_delimited_records_from_file
+
         testfile = self.test_folder / "delimited_text.txt"
-        records = get_delimited_records_from_file(testfile, delimiter="\t", encoding="utf-8")
+        records = get_delimited_records_from_file(
+            testfile, delimiter="\t", encoding="utf-8"
+        )
         print(records)
         self.assertTrue(len(records) > 0)
 
     def test_remove_items_with_certain_val_from_list(self):
         from sampytools.text_utils import remove_items_with_certain_val_from_list
+
         alist = ["one", "two", "three", ""]
         newlist = remove_items_with_certain_val_from_list(alist)
         print(newlist)
@@ -26,9 +30,17 @@ class MyTestCase(unittest.TestCase):
 
     def test_compare_two_files(self):
         from sampytools.text_utils import compare_two_files
-        lines_one = ["The empire lasted for 1000 years", "The empire was great", "The empire started its long Fall"]
-        lines_two = ["The empire lasted for 1000 years", "The empire was great",
-                     "The empire started its centuries long Fall"]
+
+        lines_one = [
+            "The empire lasted for 1000 years",
+            "The empire was great",
+            "The empire started its long Fall",
+        ]
+        lines_two = [
+            "The empire lasted for 1000 years",
+            "The empire was great",
+            "The empire started its centuries long Fall",
+        ]
         file_one = self.test_folder / "test_file_one.txt"
         file_two = self.test_folder / "test_file_two.txt"
         file_one.write_text("\n".join(lines_one))
@@ -50,5 +62,5 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue("portfolio_name" in df.columns)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

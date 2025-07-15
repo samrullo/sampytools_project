@@ -1,5 +1,6 @@
 from typing import Dict, Any, Union, Optional, Iterable
 
+
 class NominalToken:
     """
     Nominal token class to represent constant values and can be used as dictionary keys.
@@ -41,7 +42,7 @@ class NominalToken:
 
         :return: Hashcode
         """
-        return hash('NominalToken' + self.name)
+        return hash("NominalToken" + self.name)
 
     def __repr__(self):
         """
@@ -49,7 +50,7 @@ class NominalToken:
 
         :return: String representation
         """
-        return f'[{self.name}]'
+        return f"[{self.name}]"
 
 
 KeyType = Union[str, NominalToken]
@@ -61,7 +62,7 @@ class ConfigDict:
     The dictionary itself can be easily serialized into JSON or string format.
     """
 
-    __slots__ = '__dict__'
+    __slots__ = "__dict__"
 
     def __init__(self, preset: Optional[Dict[KeyType, Any]] = None):
         """
@@ -90,7 +91,7 @@ class ConfigDict:
                     del self.__dict__[k]
                 else:
                     for sub_k, sub_v in sub.items():
-                        result[f'{k}.{sub_k}'] = sub_v
+                        result[f"{k}.{sub_k}"] = sub_v
             else:
                 result[k] = v
         return result
@@ -108,7 +109,7 @@ class ConfigDict:
             return default
         return item
 
-    def update(self, another: 'Union[ConfigDict, Dict[KeyType, Any]]') -> None:
+    def update(self, another: "Union[ConfigDict, Dict[KeyType, Any]]") -> None:
         """
         Update configuration from another ConfigDict or a dictionary
 
@@ -127,11 +128,11 @@ class ConfigDict:
         :param key: Key
         :return: Value
         """
-        if isinstance(key, str) and '.' in key:
-            p = key.split('.')
+        if isinstance(key, str) and "." in key:
+            p = key.split(".")
             if p[0] not in self.__dict__:
                 self.__dict__[p[0]] = ConfigDict()
-            return self.__dict__[p[0]]['.'.join(p[1:])]
+            return self.__dict__[p[0]][".".join(p[1:])]
         if key not in self.__dict__:
             self.__dict__[key] = ConfigDict()
         return self.__dict__[key]
@@ -143,11 +144,11 @@ class ConfigDict:
         :param key: Key
         :param value: Value
         """
-        if isinstance(key, str) and '.' in key:
-            p = key.split('.')
+        if isinstance(key, str) and "." in key:
+            p = key.split(".")
             if p[0] not in self.__dict__:
                 self.__dict__[p[0]] = ConfigDict()
-            self.__dict__[p[0]]['.'.join(p[1:])] = value
+            self.__dict__[p[0]][".".join(p[1:])] = value
             return
         self.__dict__[key] = value
 
@@ -161,10 +162,10 @@ class ConfigDict:
             del self.__dict__[key]
             return
 
-        if isinstance(key, str) and '.' in key:
-            p = key.split('.')
+        if isinstance(key, str) and "." in key:
+            p = key.split(".")
             if p[0] in self.__dict__:
-                del self.__dict__[p[0]]['.'.join(p[1:])]
+                del self.__dict__[p[0]][".".join(p[1:])]
 
     def __getattr__(self, key: str):
         """
@@ -223,7 +224,7 @@ class ConfigDict:
 
         :return: Key to existing elements and methods
         """
-        yield from ('get', 'flatten', 'update')
+        yield from ("get", "flatten", "update")
         self.flatten()
         for key in self.__dict__:
             yield str(key)
