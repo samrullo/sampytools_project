@@ -11,18 +11,18 @@ def to_str(adate: Union[datetime.date, datetime.datetime], date_str_format: str)
 
 
 def to_yyyymmdd(date):
-    return to_str(date, '%Y%m%d')
+    return to_str(date, "%Y%m%d")
 
 
 def to_yyyymmdd_with_hyphen(date):
-    return to_str(date, '%Y-%m-%d')
+    return to_str(date, "%Y-%m-%d")
 
 
 def to_mmddyyyy_with_slash(date):
-    return to_str(date, '%m/%d/%Y')
+    return to_str(date, "%m/%d/%Y")
 
 
-def ppd_price_risk_date_strptime(strdate, date_pattern='%m/%d/%y'):
+def ppd_price_risk_date_strptime(strdate, date_pattern="%m/%d/%y"):
     return datetime.datetime.strptime(strdate, date_pattern)
 
 
@@ -37,16 +37,22 @@ def get_day_of_week(adate):
 
 
 def get_npdatetime64_business_monthends(start, end, cal):
-    recent_monthends = pd.date_range(start, end, freq='M')
-    monthends = [np.datetime64(cal.final_businessday_of_month(m)) for m in recent_monthends]
-    logging.info(f"Finished getting np.datetime64 business month ends from {start} to {end} based on {cal}")
+    recent_monthends = pd.date_range(start, end, freq="M")
+    monthends = [
+        np.datetime64(cal.final_businessday_of_month(m)) for m in recent_monthends
+    ]
+    logging.info(
+        f"Finished getting np.datetime64 business month ends from {start} to {end} based on {cal}"
+    )
     return monthends
 
 
 def get_datetime_business_monthends(start, end, cal):
-    recent_monthends = pd.date_range(start, end, freq='M')
+    recent_monthends = pd.date_range(start, end, freq="M")
     monthends = [cal.final_businessday_of_month(m) for m in recent_monthends]
-    logging.info(f"Finished getting datetime business month ends from {start} to {end} based on {cal}")
+    logging.info(
+        f"Finished getting datetime business month ends from {start} to {end} based on {cal}"
+    )
     return monthends
 
 
@@ -79,7 +85,7 @@ def generate_now_str_timestamp():
     Generate current timestampe in YYYYMMDD_HHMMSS format and return as string
     :return:
     """
-    return datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
+    return datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d_%H%M%S")
 
 
 def get_previous_month_end_from_today(today: datetime.date = None) -> datetime.date:
@@ -99,4 +105,4 @@ def parse_yymmdd(yymmdd: str) -> datetime.datetime:
     :param yymmdd: date string in yymmdd format
     :return: datetime from string
     """
-    return datetime.datetime.strptime(str(yymmdd), '%y%m%d')
+    return datetime.datetime.strptime(str(yymmdd), "%y%m%d")
