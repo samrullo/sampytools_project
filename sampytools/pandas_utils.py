@@ -2,7 +2,7 @@ import pathlib
 import pandas as pd
 import logging
 import re
-from typing import List, Tuple, Dict, Union,Any
+from typing import List, Tuple, Dict, Union, Any
 from sampytools.list_utils import construct_dict_from_list_of_key_values, reverse_list, \
     add_new_values_in_certain_item_location
 from enum import IntEnum
@@ -130,10 +130,10 @@ def group_count_sort_series(df, group_cols, count_column, ascending=False):
 
 
 def order_merged_dataframe_cols(
-    mrg_df: pd.DataFrame,
-    index_cols: List[str],
-    mrg_cols: List[str],
-    suffixes: Tuple[str, str],
+        mrg_df: pd.DataFrame,
+        index_cols: List[str],
+        mrg_cols: List[str],
+        suffixes: Tuple[str, str],
 ) -> pd.DataFrame:
     """
     Order columns of the merged dataframe so that relevant columns appear side by side
@@ -152,7 +152,7 @@ def order_merged_dataframe_cols(
 
 
 def compare_dataframes(
-    df1, df2, on="index", how="left", suffix_one="_one", suffix_two="_two"
+        df1, df2, on="index", how="left", suffix_one="_one", suffix_two="_two"
 ):
     """
     Merge two dataframes on a common key and sort columns s
@@ -187,7 +187,7 @@ def pandas_multi_index_to_columns(agg_df: pd.DataFrame):
 
 
 def pandas_series_multi_index_to_columns(
-    agg_series: pd.Series, series_col_name: str = "count"
+        agg_series: pd.Series, series_col_name: str = "count"
 ) -> pd.DataFrame:
     """
     Multi index series to dataframe with columns representing each level of multi level index
@@ -216,7 +216,7 @@ def wrap_code_in_wiki_macro(code_text):
 
 
 def convert_dataframe_to_wiki_table(
-    df, code_col="empty", good_table_class_name="some_code", col_styles=None
+        df, code_col="empty", good_table_class_name="some_code", col_styles=None
 ):
     """
     Convert dataframe into good wiki table
@@ -246,7 +246,7 @@ def convert_dataframe_to_wiki_table(
 
 
 def convert_columns_to_str(
-    df: pd.DataFrame, str_columns: List[str] = None
+        df: pd.DataFrame, str_columns: List[str] = None
 ) -> pd.DataFrame:
     """
     Convert specified columns to string
@@ -267,7 +267,7 @@ def convert_columns_to_str(
 
 
 def convert_columns_to_lowercase_and_nowhitespace(
-    df: pd.DataFrame, join_char: str = "_"
+        df: pd.DataFrame, join_char: str = "_"
 ) -> pd.DataFrame:
     """
     Remove punctuation marks from column names and convert column names to lowercase
@@ -303,7 +303,7 @@ import numpy as np
 
 
 def create_new_key_from_two_cols_for_dataframe(
-    df, col_one, col_two, new_key_name="new_key"
+        df, col_one, col_two, new_key_name="new_key"
 ):
     """
     Make a new key from two columns of a dataframe, which is a simple tuple with two elements
@@ -321,7 +321,7 @@ def create_new_key_from_two_cols_for_dataframe(
 
 
 def get_records_with_certain_criteria_from_dataframe(
-    df, key_col, eval_col, criteria=np.max
+        df, key_col, eval_col, criteria=np.max
 ):
     """
     Extract records from dataframe with repeating values where we are interested in certain values only
@@ -353,7 +353,7 @@ def clean_up_multi_index_cols(mi_cols: List[Tuple[str, ...]]) -> List[Tuple[str,
 
 
 def convert_multi_index_col_to_one_dim_col(
-    df: pd.DataFrame, join_char: str = "."
+        df: pd.DataFrame, join_char: str = "."
 ) -> pd.DataFrame:
     """
     Convert multi index column to one dimensional column
@@ -368,7 +368,7 @@ def convert_multi_index_col_to_one_dim_col(
 
 
 def write_dataframes_to_excel(
-    sht: Dict[str, Tuple[pd.DataFrame, bool]], folder: pathlib.Path, filename: str
+        sht: Dict[str, Tuple[pd.DataFrame, bool]], folder: pathlib.Path, filename: str
 ):
     """
     write multiple dataframes into single excel file
@@ -384,7 +384,7 @@ def write_dataframes_to_excel(
 
 
 def convert_df_col_to_dicts(
-    df: pd.DataFrame, col_name: str, sep: str = ";", should_reverse: bool = False
+        df: pd.DataFrame, col_name: str, sep: str = ";", should_reverse: bool = False
 ) -> pd.DataFrame:
     """
     Convert dataframe columns that has key,vals separated by character to a dictionary
@@ -415,7 +415,7 @@ def get_distinct_keys_from_list_of_dicts(thedict_list: List[dict]):
 
 
 def extract_dict_keys_to_columns(
-    df: pd.DataFrame, col_name: str, remove_orig_col: bool = False, prefix: str = ""
+        df: pd.DataFrame, col_name: str, remove_orig_col: bool = False, prefix: str = ""
 ) -> pd.DataFrame:
     """
     Extract keys of dictionaries to dataframe columns
@@ -448,7 +448,7 @@ def extract_dict_keys_to_columns(
 
 
 def get_mask_for_matching_column_against_pattern(
-    df: pd.DataFrame, col_name: str, one_pattern: re.Pattern
+        df: pd.DataFrame, col_name: str, one_pattern: re.Pattern
 ):
     """
     Get True/False series by matching dataframe column values against a pattern
@@ -463,7 +463,7 @@ def get_mask_for_matching_column_against_pattern(
 
 
 def filter_df_records_matching_one_pattern(
-    df: pd.DataFrame, col_name: str, one_pattern: re.Pattern
+        df: pd.DataFrame, col_name: str, one_pattern: re.Pattern
 ):
     """
     Return dataframe records by matching column values against a pattern
@@ -481,7 +481,7 @@ class LogicalOperator(IntEnum):
 
 
 def filter_df_records_matching_text_patterns(
-    df: pd.DataFrame, col_name: str, text_patterns: List[Union[str, re.Pattern]]
+        df: pd.DataFrame, col_name: str, text_patterns: List[Union[str, re.Pattern]]
 ) -> pd.DataFrame:
     """
     Return dataframe records by matching column values against a list of regex patterns.
@@ -506,7 +506,7 @@ def filter_df_records_matching_text_patterns(
 
 
 def list_of_dict_to_dataframe(
-    records: List[Dict[Any, Any]], key_col_name: str = None, value_col_name: str = None
+        records: List[Dict[Any, Any]], key_col_name: str = None, value_col_name: str = None
 ) -> pd.DataFrame:
     """
     Convert a list of dictionaries to dataframe
@@ -539,7 +539,7 @@ def print_df_header(df: pd.DataFrame, no_of_head_rows: int = 5, cols: List[str] 
 
 
 def remove_nonnumeric_chars_from_numeric_cols(
-    df: pd.DataFrame, numeric_cols: List[str] = None
+        df: pd.DataFrame, numeric_cols: List[str] = None
 ) -> pd.DataFrame:
     """
     Remove all non-numeric characters from values of numeric columns.
@@ -556,7 +556,9 @@ def remove_nonnumeric_chars_from_numeric_cols(
 
     return df
 
-def create_new_col_based_on_dict(df: pd.DataFrame, col_name: str, new_col_name: str, mapping_dict: dict) -> pd.DataFrame:
+
+def create_new_col_based_on_dict(df: pd.DataFrame, col_name: str, new_col_name: str,
+                                 mapping_dict: dict) -> pd.DataFrame:
     """
     Create a new column by mapping existing column values to dictionary values.
 
@@ -568,3 +570,15 @@ def create_new_col_based_on_dict(df: pd.DataFrame, col_name: str, new_col_name: 
     """
     df[new_col_name] = df[col_name].map(lambda item: mapping_dict.get(item, item))
     return df
+
+
+def groupby_and_construct_dict_from_df(df: pd.DataFrame, groupby_col: str, key_col: str, val_col: str):
+    """
+    Group dataframe by a column and construct a dictionary from two other columns.
+    :param df:
+    :param groupby_col:
+    :param key_col:
+    :param val_col:
+    :return:
+    """
+    return df.groupby(groupby_col).apply(lambda g: dict(zip(g[key_col], g[val_col]))).reset_index()
