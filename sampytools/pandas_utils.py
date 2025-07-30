@@ -572,7 +572,8 @@ def create_new_col_based_on_dict(df: pd.DataFrame, col_name: str, new_col_name: 
     return df
 
 
-def groupby_and_construct_dict_from_df(df: pd.DataFrame, groupby_col: str, key_col: str, val_col: str):
+def groupby_and_construct_dict_from_df(df: pd.DataFrame, groupby_col: str, key_col: str, val_col: str,
+                                       new_col_name: str = "grouped_dict") -> pd.DataFrame:
     """
     Group dataframe by a column and construct a dictionary from two other columns.
     :param df:
@@ -581,4 +582,6 @@ def groupby_and_construct_dict_from_df(df: pd.DataFrame, groupby_col: str, key_c
     :param val_col:
     :return:
     """
-    return df.groupby(groupby_col).apply(lambda g: dict(zip(g[key_col], g[val_col]))).reset_index()
+    grpdf = df.groupby(groupby_col).apply(lambda g: dict(zip(g[key_col], g[val_col]))).reset_index()
+    grpdf.columns = [groupby_col, new_col_name]
+    return grpdf

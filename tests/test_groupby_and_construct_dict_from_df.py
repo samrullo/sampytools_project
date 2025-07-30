@@ -13,7 +13,7 @@ class TestGroupByAndConstructDict(unittest.TestCase):
         result = groupby_and_construct_dict_from_df(df, 'group', 'key_col', 'val_col')
         expected = pd.DataFrame({
             'group': ['A', 'B'],
-            0: [{'k1': 'v1', 'k2': 'v2'}, {'k1': 'v3', 'k3': 'v4'}]
+            "grouped_dict": [{'k1': 'v1', 'k2': 'v2'}, {'k1': 'v3', 'k3': 'v4'}]
         })
         pd.testing.assert_frame_equal(result, expected)
 
@@ -26,7 +26,7 @@ class TestGroupByAndConstructDict(unittest.TestCase):
         result = groupby_and_construct_dict_from_df(df, 'group', 'key_col', 'val_col')
         expected = pd.DataFrame({
             'group': ['X'],
-            0: [{'k5': 'v5', 'k6': 'v6'}]
+            "grouped_dict": [{'k5': 'v5', 'k6': 'v6'}]
         })
         pd.testing.assert_frame_equal(result, expected)
 
@@ -40,7 +40,7 @@ class TestGroupByAndConstructDict(unittest.TestCase):
         result = groupby_and_construct_dict_from_df(df, 'group', 'key_col', 'val_col')
         expected = pd.DataFrame({
             'group': ['G1'],
-            0: [{'dup': 'second'}]  # second value overwrites the first in a dict
+            "grouped_dict": [{'dup': 'second'}]  # second value overwrites the first in a dict
         })
         pd.testing.assert_frame_equal(result, expected)
 
@@ -53,7 +53,7 @@ class TestGroupByAndConstructDict(unittest.TestCase):
         result = groupby_and_construct_dict_from_df(df, 'group', 'key_col', 'val_col')
         expected = pd.DataFrame({
             'group': ['Z'],
-            0: [{'x': 1, 'y': 2}]
+            "grouped_dict": [{'x': 1, 'y': 2}]
         })
         pd.testing.assert_frame_equal(result, expected)
 
