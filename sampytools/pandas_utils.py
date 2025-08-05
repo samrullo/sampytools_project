@@ -585,3 +585,23 @@ def groupby_and_construct_dict_from_df(df: pd.DataFrame, groupby_col: str, key_c
     grpdf = df.groupby(groupby_col).apply(lambda g: dict(zip(g[key_col], g[val_col]))).reset_index()
     grpdf.columns = [groupby_col, new_col_name]
     return grpdf
+
+def combine_two_legs_into_single_row_in_dataframe(df:pd.DataFrame,leg_type_col_name:str,index_cols:List[str],leg_names_mapping:dict=None)->pd.DataFrame:
+    """
+    When you have a dataframe that represents single data as multiple rows, you can use this function to combine such data into single row
+    :param df: dataframe where each logical datapoint is represented as multiple rows
+    :param leg_type_col_name: the column that labels each leg of the logically one data
+    :param index_cols: index columns that uniquely represent logically one data
+    :param leg_names_mapping: in case you want to name legs with different names
+    :return:
+    """
+    if leg_names_mapping is None:
+        leg_names=df[leg_type_col_name].unique()
+        leg_names_mapping={leg_name:leg_name for leg_name in leg_names}
+    # this will create a new dataframe where multiple rows of logically single data are combined into one
+    # For instance let's say you have legs L,S and you have columns like coupon_frequency, coupon_type
+    # pvtdf will have two layer columns like coupon_frequency_L, coupon_frequency_S, coupon_type_L, coupon_type_S
+    pvtdf=df.pivot_table(index=index_cols,columns=leg_type_col_name,aggfunc="first")
+    pvtdf.columns=[f"{field}_{leg_names_mapping[col]}"for field,col in pvtdf.columns]
+    pvtdf.reset_index(inplace=True)
+    return pvtdf
