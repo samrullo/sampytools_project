@@ -12,7 +12,7 @@ def convert_dict_to_delimited_text(thedict: Dict[str, str], join_char: str = ";"
     key_val_list = []
     for key, val in thedict.items():
         if reverse:
-            key_val_list += [val, key]
+            key_val_list += [str(val), str(key)]
         else:
-            key_val_list += [key, val]
+            key_val_list += [str(key), str(val)]
     return f"{join_char}".join(key_val_list)
