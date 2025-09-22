@@ -9,11 +9,6 @@ from enum import IntEnum
 
 
 def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    for dataframes that have duplicate column names, make column names unique by adding indices to their names
-    :param df: dataframe
-    :return: dataframe now with columns renamed to be unique
-    """
     cols = df.columns.tolist()
     cols_df = pd.DataFrame({'col_idx': cols, 'col_name': cols})
     cols_count_df = cols_df.groupby('col_idx')[['col_name']].count()
@@ -22,7 +17,10 @@ def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
         new_cols = []
         for col in cols_list:
             if col in duplicate_columns.keys():
-                new_cols.append(col + str(duplicate_columns[col]))
+                if duplicate_columns[col]>1:
+                    new_cols.append(col + str(duplicate_columns[col]-1))
+                else:
+                    new_cols.append(col)
                 duplicate_columns[col] += 1
             else:
                 new_cols.append(col)
@@ -30,8 +28,8 @@ def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
 
     duplicate_columns = cols_count_df[cols_count_df['col_name'] > 1].index.tolist()
     duplicate_cols_dict = {col: 1 for col in duplicate_columns}
-
-    return df[append_index_to_duplicate_columns(duplicate_cols_dict, cols)]
+    df.columns = append_index_to_duplicate_columns(duplicate_cols_dict, cols)
+    return df
 
 
 def strip_string_columns(df, string_columns) -> pd.DataFrame:
