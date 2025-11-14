@@ -4,60 +4,66 @@ import tempfile
 import zipfile
 import shutil
 
-# adjust the import to where your zip_file is defined
-from sampytools.zip_utils import zip_file
+from sampytools.zip_utils import zip_file  # adjust if the import path differs
 
 
 class TestZipFile(unittest.TestCase):
     def setUp(self):
-        # create a temp dir for each test
+        # create temporary directory for testing
         self.tempdir = pathlib.Path(tempfile.mkdtemp())
-        # sample file to be zipped
-        self.sample_file = self.tempdir / "hello.txt"
-        self.sample_contents = b"hello unit test\n"
-        self.sample_file.write_bytes(self.sample_contents)
+        self.sample_file = self.tempdir / "example.txt"
+        self.sample_data = b"this is a test file\n"
+        self.sample_file.write_bytes(self.sample_data)
 
     def tearDown(self):
-        # clean up tempdir
+        # clean up the temporary directory after each test
         shutil.rmtree(self.tempdir)
 
-    def test_zip_file_creates_zip_default_path(self):
-        """
-        When zip_path is omitted, zip_file should create <file_stem>.zip
-        in the same folder and include the file with arcname == file.name.
-        """
-        # call function under test (no zip_path -> default behavior)
-        zip_file(self.sample_file)
+    def test_zip_file_default_path(self):
+        """Test that zip_file() creates <filename>.zip when zip_path is None."""
+        zip_path = zip_file(self.sample_file)
 
-        expected_zip = self.sample_file.parent / f"{self.sample_file.stem}.zip"
-        self.assertTrue(expected_zip.exists(), f"Expected zip at {expected_zip} but not found")
+        # assert zip file created correctly
+        self.assertTrue(zip_path.exists(), f"Expected zip file {zip_path} to exist.")
+        self.assertEqual(zip_path.suffix, ".zip")
 
-        # open zip and check contents
-        with zipfile.ZipFile(expected_zip, "r") as z:
+        # verify archive contents
+        with zipfile.ZipFile(zip_path, "r") as z:
             namelist = z.namelist()
-            # arcname used in implementation is file.name -> "hello.txt"
             self.assertIn(self.sample_file.name, namelist)
-            # read the file from archive and compare bytes
-            with z.open(self.sample_file.name, "r") as f:
-                read_bytes = f.read()
-            self.assertEqual(read_bytes, self.sample_contents)
 
-    def test_zip_file_creates_zip_explicit_path(self):
-        """
-        When zip_path is provided, zip_file should write to that path and
-        still include the file with arcname == file.name.
-        """
-        custom_zip = self.tempdir / "custom_archive.zip"
-        # call with explicit zip_path
-        zip_file(self.sample_file, zip_path=custom_zip)
+            # verify file content is the same after extraction
+            with z.open(self.sample_file.name) as f:
+                extracted_data = f.read()
+            self.assertEqual(extracted_data, self.sample_data)
 
-        self.assertTrue(custom_zip.exists(), "Expected custom zip file to exist")
+    def test_zip_file_custom_path(self):
+        """Test that zip_file() writes to a user-specified zip_path."""
+        custom_zip = self.tempdir / "custom_output.zip"
+        result_path = zip_file(self.sample_file, custom_zip)
+
+        # assert returned path equals the one we passed
+        self.assertEqual(result_path, custom_zip)
+        self.assertTrue(custom_zip.exists())
 
         with zipfile.ZipFile(custom_zip, "r") as z:
             self.assertIn(self.sample_file.name, z.namelist())
-            with z.open(self.sample_file.name, "r") as f:
-                read_bytes = f.read()
-            self.assertEqual(read_bytes, self.sample_contents)
+
+    def test_zip_file_overwrite_existing(self):
+        """Test that zip_file() overwrites an existing zip file cleanly."""
+        zip_path = self.tempdir / "overwrite.zip"
+
+        # create a dummy zip file first
+        with zipfile.ZipFile(zip_path, "w") as z:
+            z.writestr("dummy.txt", "old content")
+
+        # now call zip_file() again, it should overwrite
+        zip_file(self.sample_file, zip_path)
+
+        with zipfile.ZipFile(zip_path, "r") as z:
+            namelist = z.namelist()
+            self.assertNotIn("dummy.txt", namelist)  # old file removed
+            self.assertIn(self.sample_file.name, namelist)
 
 
 if __name__ == "__main__":

@@ -29,3 +29,4 @@ def zip_file(file_path: pathlib.Path, zip_path: pathlib.Path = None):
         z.write(file_path, arcname=file_path.name)
 
     logging.info(f"Zipped {file_path} -> {zip_path}")
+    return zip_path
