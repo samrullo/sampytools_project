@@ -14,6 +14,8 @@ def unzip_archive(zipfilepath: pathlib.Path, save_to_folder: pathlib.Path = None
         save_to_folder = zipfilepath.parent / zipfilepath.stem
     with zipfile.ZipFile(zipfilepath, "r") as z:
         z.extractall(save_to_folder)
+        logging.info(f"Extracted {zipfilepath} -> {save_to_folder}")
+    return save_to_folder
 
 
 def zip_file(file_path: pathlib.Path, zip_path: pathlib.Path = None):
