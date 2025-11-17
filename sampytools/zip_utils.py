@@ -1,6 +1,9 @@
 import pathlib
 import zipfile
 import logging
+import gzip
+import shutil
+
 
 
 def unzip_archive(zipfilepath: pathlib.Path, save_to_folder: pathlib.Path = None):
@@ -16,6 +19,22 @@ def unzip_archive(zipfilepath: pathlib.Path, save_to_folder: pathlib.Path = None
         z.extractall(save_to_folder)
         logging.info(f"Extracted {zipfilepath} -> {save_to_folder}")
     return save_to_folder
+
+
+def decompress_gz(gz_path: pathlib.Path, save_to_folder: pathlib.Path = None):
+    """
+    Decompress a .gz file to the specified folder
+    """
+    if save_to_folder is None:
+        save_to_folder = gz_path.parent
+
+    output_path = save_to_folder / gz_path.stem  # remove .gz extension
+    with gzip.open(gz_path, 'rb') as f_in:
+        with open(output_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    logging.info(f"Extracted {gz_path} -> {output_path}")
+    return output_path
 
 
 def zip_file(file_path: pathlib.Path, zip_path: pathlib.Path = None):
