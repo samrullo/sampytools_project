@@ -20,6 +20,21 @@ def unzip_archive(zipfilepath: pathlib.Path, save_to_folder: pathlib.Path = None
         logging.info(f"Extracted {zipfilepath} -> {save_to_folder}")
     return save_to_folder
 
+def compress_to_gz(file_path: pathlib.Path, save_to_folder: pathlib.Path = None):
+    """
+    Compress a file into .gz format, saved to the specified folder.
+    """
+    if save_to_folder is None:
+        save_to_folder = file_path.parent
+
+    output_path = save_to_folder / f"{file_path.name}.gz"
+
+    with open(file_path, "rb") as f_in:
+        with gzip.open(output_path, "wb") as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    logging.info(f"Compressed {file_path} -> {output_path}")
+    return output_path
 
 def decompress_gz(gz_path: pathlib.Path, save_to_folder: pathlib.Path = None):
     """
