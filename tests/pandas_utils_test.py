@@ -1,11 +1,13 @@
 import unittest
 import pathlib
+import tempfile
 
 from sampytools.list_utils import get_list_diff
 
 from sampytools.pandas_utils import extract_dict_keys_to_columns
 import pandas as pd
 from sampytools.pandas_utils import remove_nonnumeric_chars_from_numeric_cols
+from sampytools.pandas_utils import read_csv_file_with_multiple_encodings
 
 class MyTestCase(unittest.TestCase):
     @classmethod
@@ -170,6 +172,37 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(result_df), 3)
         self.assertAlmostEqual(result_df["diff_value"].iloc[0], 10)
         self.assertAlmostEqual(result_df["abs_diff_value_pct"].iloc[1], abs((200 / 210 - 1) * 100))
+
+    def test_read_csv_file_with_multiple_encodings_falls_back_to_cp932(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            file_path = pathlib.Path(tmpdir) / "cp932.csv"
+            file_path.write_bytes("col\nあ\n".encode("cp932"))
+
+            df = read_csv_file_with_multiple_encodings(file_path)
+
+            self.assertEqual(df.loc[0, "col"], "あ")
+
+    def test_read_csv_file_with_multiple_encodings_falls_back_to_latin1_when_specified(self):
+        # latin1 bytes like 0xE9 (é) will fail utf-8 decoding, forcing fallback to latin1
+        with tempfile.TemporaryDirectory() as tmpdir:
+            file_path = pathlib.Path(tmpdir) / "latin1.csv"
+            file_path.write_bytes("col\ncafé\n".encode("latin1"))
+
+            df = read_csv_file_with_multiple_encodings(
+                file_path, encodings_to_try=["utf-8", "latin1"]
+            )
+
+            self.assertEqual(df.loc[0, "col"], "café")
+
+    def test_read_csv_file_with_multiple_encodings_raises_when_all_encodings_fail(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            file_path = pathlib.Path(tmpdir) / "cp932.csv"
+            file_path.write_bytes("col\nあ\n".encode("cp932"))
+
+            with self.assertRaises(UnicodeDecodeError) as cm:
+                read_csv_file_with_multiple_encodings(file_path, encodings_to_try=["utf-8"])
+
+            self.assertIn("Could not read", str(cm.exception))
 
 
 

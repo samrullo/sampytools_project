@@ -606,3 +606,30 @@ def combine_two_legs_into_single_row_in_dataframe(df: pd.DataFrame, leg_type_col
     pvtdf.columns = [f"{field}_{leg_names_mapping[col]}" for field, col in pvtdf.columns]
     pvtdf.reset_index(inplace=True)
     return pvtdf
+
+def read_csv_file_with_multiple_encodings(filepath: pathlib.Path, **kwargs) -> pd.DataFrame:
+    """
+    Read a CSV file trying multiple encodings in case of UnicodeDecodeError
+    :param filepath: Path to the CSV file
+    :param kwargs: Additional arguments to pass to pd.read_csv
+    :return: DataFrame
+    """
+    if "encodings_to_try" in kwargs:
+        encodings_to_try = kwargs.pop("encodings_to_try")
+    else:
+        encodings_to_try = ['utf-8', 'cp932', 'latin1']
+    for encoding in encodings_to_try:
+        try:
+            df = pd.read_csv(filepath, encoding=encoding, **kwargs)
+            logging.info(f"Successfully read {filepath} with encoding {encoding}")
+            return df
+        except UnicodeDecodeError:
+            logging.warning(f"UnicodeDecodeError encountered when reading {filepath} with encoding {encoding}. Retrying with next encoding.")
+    # UnicodeDecodeError requires (encoding, object, start, end, reason)
+    raise UnicodeDecodeError(
+        encodings_to_try[-1] if encodings_to_try else "unknown",
+        b"\x00",
+        0,
+        1,
+        f"Could not read {filepath} with any of the tried encodings: {encodings_to_try}",
+    )
