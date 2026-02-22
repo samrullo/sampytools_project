@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sampytools"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = ["pandas", "scikit-learn","build","setuptools","setuptools-scm","pytest"]
 
 [project.scripts]
