@@ -479,7 +479,9 @@ class LogicalOperator(IntEnum):
 
 
 def filter_df_records_matching_text_patterns(
-        df: pd.DataFrame, col_name: str, text_patterns: List[Union[str, re.Pattern]]
+        df: pd.DataFrame, col_name: str,
+        text_patterns: List[Union[str, re.Pattern]],
+        should_lowercase_col:bool=False
 ) -> pd.DataFrame:
     """
     Return dataframe records by matching column values against a list of regex patterns.
@@ -487,6 +489,7 @@ def filter_df_records_matching_text_patterns(
     :param df: DataFrame
     :param col_name: Column name that contains string values.
     :param text_patterns: List of regex patterns or strings.
+    :param should_lowercase_col: should lowercase col before searching
     :return: Filtered DataFrame
     """
     if not text_patterns:
@@ -497,7 +500,7 @@ def filter_df_records_matching_text_patterns(
         df[col_name]
         .astype(str)
         .apply(
-            lambda x: any(re.search(pattern, x.lower()) for pattern in text_patterns)
+            lambda x: any(re.search(pattern, x.lower() if should_lowercase_col else x) for pattern in text_patterns)
         )
     )
     return df[mask]
